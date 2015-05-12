@@ -3,7 +3,7 @@
 	"version" : "0.0.1",
 	"main" : "app.js",
 	"scripts" : {
-		"start" : "sudo node app.js"
+		"start" : "node app.js"
 		},
 	"dependencies" : {
 		"express" : "4.12.3",
