@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-	watson = require('../server/watson.js'),
+	Watson = require('../server/watson.js'),
 	lib = require('../server/vars.js')
 
 module.exports = function() {
@@ -10,17 +10,18 @@ module.exports = function() {
 	var db = mongoose.connection;
 
 	db.on('error', function(err) { // Error response
-		watson.reportError(err)
+		Watson.handleError(err)
+		lib
 		console.log(">Error")
 	}); 
 
 	db.on('disconnected', function (err) {
-		lib.dbStatus = false
+		lib.db.status = false
 		console.log(">Disconnected")
 	})
 
 	db.on('connected', function () {
-		lib.dbStatus = true
+		lib.db.status = true
 		console.log(">Connected")
 	})
 

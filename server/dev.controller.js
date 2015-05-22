@@ -1,12 +1,11 @@
 var Base = require('mongoose').model('Base'),
 	lib = require('./vars.js'),
-	watson = require('./watson.js')
+	Watson = require('./watson.js')
 
 /*
 ======================= Creating =======================
 */
 exports.testA = function(req, res, next) {
-	watson.test()
 	res.send()
 }
 
@@ -26,14 +25,17 @@ exports.createBase = function(req, res) {
 
 	base.save(function (err, base) {
 		if (err) {
+			err.cause = "Base"
 			// Send error response
-			res.status(500).send(watson.handleError)
+			Watson.checkout()
+			res.status(500).send(Watson.handleError(err))
 		}
 		else {
 			lib.bases[req.body.basecode] = [];
 			// Update vars.js
 			lib.bases[req.body.basecode][req.body.name] = {adminLvl: "1"}
 			// Send success
+			Watson.checkout()
 			res.status(201).end()
 		}
 	})
@@ -46,8 +48,10 @@ exports.createBase = function(req, res) {
 exports.getAllBases = function(req, res, next) {
 	Base.find({}, function (err, bases) {
 		if (err) {
-			return err
+			Watson.checkout()
+			res.status(500).send(Watson.handleError(err))
 		} else {
+			Watson.checkout()
 			res.send(bases)
 		}
 	})
@@ -63,8 +67,10 @@ exports.updateDuration = function(req, res, next) {
 		{tokenDuration: req.body.tokenDuration}, 
 		function (err, base) {
 			if (err) {
+				Watson.checkout()
 				res.status(500).end()
 			} else {
+				Watson.checkout()
 				res.status(204).end()
 			}
 		}

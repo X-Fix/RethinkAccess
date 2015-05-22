@@ -1,12 +1,13 @@
 var Base = require('mongoose').model('Base'),
-	lib = require('./vars.js')
+	lib = require('./vars.js'),
+	Watson = require('./watson.js')
 
 /*
 ======================= Initial GET =======================
 */
 
 exports.renderLogin = function (req, res) {
-	
+	res.send("Get successfull")
 }
 
 /*
@@ -35,10 +36,7 @@ exports.verifyPassword = function(req, res, next) {
 
 	if (req.userIndex >= 0 && req.users[req.userIndex].password == req.body.password) {
 		// Prepare token details
-		var token = {
-			hash: newHash(),
-			expires: newExpires(lib.baseDurations[10])
-		}
+		var token = Watson.newToken(lib.baseDurations[req.basecode])
 
 		// Set headers
 		res.set('Access-Control-Expose-Headers', 'X-Base, X-Token')
@@ -56,25 +54,26 @@ exports.verifyPassword = function(req, res, next) {
 		return next()
 
 	} else {
+		Watson.checkout()
 		res.status(401).send("Invalid details")
 	}
 }
 
 exports.getAllBaseUsers = function(req, res, next) {
-	
 	var condition;
 	if (req.body.basecode) {
 		condition = {basecode:req.body.basecode}
 	} else {
 		condition = {'users.name':req.body.name}
 	}
-
 	Base.findOne(
 			condition, 
 			function (err, base) {
 		if (err) {
-			res.status(500).send(err.message)
+			Watson.checkout()
+			res.status(500).send(Watson.handleError(err))
 		} else if (!base) {
+			Watson.checkout()
 			res.status(404).send("No base found")
 		} else {
 			req.users = base.users
@@ -86,6 +85,7 @@ exports.getAllBaseUsers = function(req, res, next) {
 }
 
 exports.showBaseUsers = function(req, res) {
+	Watson.checkout()
 	res.send(req.users)
 }
 
@@ -109,9 +109,10 @@ exports.updateBase = function(req, res) {
 			{ users : req.users}, 
 			function (err, base) {
 		if (err) {
+			Watson.checkout()
 			res.status(500).send("Base update error")
 		} else {
-			console.log(base)
+			Watson.checkout()
 			res.status(204).end()
 		}
 	})

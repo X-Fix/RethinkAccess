@@ -3,6 +3,7 @@ var mongoose = require('mongoose'),
 
 var BaseSchema = new Schema({
 	basecode: String,
+	adminContact: String,
 	tokenDuration: Number,
 	users : [{
 		name: {
